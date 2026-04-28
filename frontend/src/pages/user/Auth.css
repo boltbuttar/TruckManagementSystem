@@ -1,0 +1,76 @@
+.auth-page {
+  min-height: 100vh;
+  background: var(--bg-dark);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.auth-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+}
+.auth-blob--1 { width: 500px; height: 500px; background: rgba(255,107,43,0.1); top: -150px; right: -150px; }
+.auth-blob--2 { width: 400px; height: 400px; background: rgba(255,184,0,0.07); bottom: -100px; left: -100px; }
+
+.auth-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 24px 60px;
+  position: relative;
+  z-index: 1;
+}
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 48px 44px;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-card);
+}
+.auth-card--wide { max-width: 720px; }
+
+.auth-card__header { text-align: center; margin-bottom: 32px; }
+.auth-logo   { font-size: 48px; margin-bottom: 12px; }
+.auth-title  { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+.auth-sub    { font-size: 15px; color: var(--text-muted); }
+
+/* Role toggle */
+.auth-role-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  margin-bottom: 28px;
+}
+.auth-role-toggle button {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  transition: all 0.25s;
+}
+.auth-role-toggle button.active {
+  background: var(--accent-grad);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(255,107,43,0.3);
+}
+
+.auth-form { display: flex; flex-direction: column; gap: 20px; }
+.auth-footer-text { text-align: center; margin-top: 24px; font-size: 14px; color: var(--text-muted); }
+.auth-link { color: var(--accent-orange); font-weight: 600; }
+.auth-link:hover { text-decoration: underline; }
+
+@media (max-width: 500px) {
+  .auth-card { padding: 32px 20px; }
+}

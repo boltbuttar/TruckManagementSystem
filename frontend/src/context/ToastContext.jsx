@@ -1,0 +1,71 @@
+import React, { createContext, useContext, useState, useCallback } from 'react'
+
+const ToastContext = createContext(null)
+
+export const ToastProvider = ({ children }) => {
+  const [toasts, setToasts] = useState([])
+
+  const addToast = useCallback((message, type = 'info', duration = 4000) => {
+    const id = Date.now()
+    const toast = { id, message, type }
+
+    setToasts(prev => [...prev, toast])
+
+    if (duration > 0) {
+      setTimeout(() => {
+        setToasts(prev => prev.filter(t => t.id !== id))
+      }, duration)
+    }
+
+    return id
+  }, [])
+
+  const removeToast = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }, [])
+
+  const success = useCallback((message, duration) => addToast(message, 'success', duration), [addToast])
+  const error = useCallback((message, duration) => addToast(message, 'error', duration), [addToast])
+  const warning = useCallback((message, duration) => addToast(message, 'warning', duration), [addToast])
+  const info = useCallback((message, duration) => addToast(message, 'info', duration), [addToast])
+
+  return (
+    <ToastContext.Provider value={{ addToast, removeToast, success, error, warning, info, toasts }}>
+      {children}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+    </ToastContext.Provider>
+  )
+}
+
+export const useToast = () => {
+  const context = useContext(ToastContext)
+  if (!context) throw new Error('useToast must be used within ToastProvider')
+  return context
+}
+
+function ToastContainer({ toasts, removeToast }) {
+  return (
+    <div className="toast-container">
+      {toasts.map(toast => (
+        <Toast key={toast.id} {...toast} onRemove={() => removeToast(toast.id)} />
+      ))}
+    </div>
+  )
+}
+
+function Toast({ id, message, type, onRemove }) {
+  const icons = {
+    success: '✅',
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️',
+  }
+
+  return (
+    <div className={`toast toast--${type}`} role="alert">
+      <span className="toast__icon">{icons[type]}</span>
+      <span className="toast__message">{message}</span>
+      <button className="toast__close" onClick={onRemove} aria-label="Close">×</button>
+    </div>
+  )
+}
