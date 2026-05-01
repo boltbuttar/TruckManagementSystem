@@ -52,11 +52,7 @@ npm run dev
 
 ---
 
-## 🔑 Default Credentials
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@truckflow.com | admin123 |
 
 ---
 
