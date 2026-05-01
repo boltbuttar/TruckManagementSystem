@@ -1,53 +1,18 @@
 /**
  * API Service - Handles all backend communication
- * Base URL: http://localhost:5000/api (or your backend URL)
+ *
+ * Delegates to the centralised client in src/api/client.js so that the base
+ * URL and auth-header injection are defined in a single place.
  */
 
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
+import { apiRequest, getToken } from '../api/client.js'
 
-// Helper to get auth token from localStorage
-const getAuthToken = () => {
-  try {
-    const user = JSON.parse(localStorage.getItem('tdms_user'))
-    return user?.token || null
-  } catch {
-    return null
-  }
-}
+// Re-export so any code that imported getAuthToken from here still works.
+export { getToken as getAuthToken }
 
-// Helper to make API calls
+// Helper to make API calls — kept for internal use by the named exports below.
 const apiCall = async (endpoint, options = {}) => {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  }
-
-  const token = getAuthToken()
-  if (token) headers.Authorization = `Bearer ${token}`
-
-  try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      ...options,
-      headers,
-    })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      throw {
-        status: response.status,
-        message: data.message || 'An error occurred',
-        errors: data.errors || {},
-      }
-    }
-
-    return data
-  } catch (error) {
-    if (error instanceof TypeError) {
-      throw { status: 0, message: 'Network error - Backend not reachable' }
-    }
-    throw error
-  }
+  return apiRequest(`/api${endpoint}`, options)
 }
 
 // ═════════════════════════════════════════════════════════════════════
@@ -73,10 +38,10 @@ export const auth = {
       body: JSON.stringify({ email, password }),
     }),
 
-  logout: () => {
-    localStorage.removeItem('tdms_user')
-    return Promise.resolve()
-  },
+  logout: () =>
+    apiCall('/auth/logout', { method: 'POST' }).catch(() => {
+      // Swallow errors — the token is cleared client-side regardless.
+    }),
 }
 
 // ═════════════════════════════════════════════════════════════════════
