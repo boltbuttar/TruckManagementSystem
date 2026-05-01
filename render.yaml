@@ -1,0 +1,26 @@
+# Render Blueprint – deploys backend as a Web Service
+# https://render.com/docs/blueprint-spec
+#
+# Usage:
+#   1. Push this file to your repo root.
+#   2. In Render dashboard → New → Blueprint, connect the repo.
+#   3. Fill in the secret env var values (MONGODB_URI, JWT_SECRET, CLIENT_URL).
+
+services:
+  - type: web
+    name: truckflow-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false        # Set manually in Render dashboard
+      - key: JWT_SECRET
+        sync: false        # Set manually in Render dashboard
+      - key: CLIENT_URL
+        sync: false        # Set to your Vercel frontend URL
+      - key: PORT
+        value: 5000
