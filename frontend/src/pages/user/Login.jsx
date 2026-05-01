@@ -21,20 +21,22 @@ export default function Login() {
     return !Object.keys(e).length
   }
 
-  const handleSubmit = (ev) => {
+  const handleSubmit = async (ev) => {
     ev.preventDefault()
     if (!validate()) return
     setLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      login({ name: 'Demo Driver', email: form.email, role: form.role })
-      if (form.role === 'admin') {
+    try {
+      const user = await login({ email: form.email, password: form.password, role: form.role })
+      if (user.role === 'admin') {
         navigate('/admin/dashboard')
       } else {
         navigate('/driver/dashboard')
       }
+    } catch (err) {
+      setErrors({ form: err.message || 'Invalid email or password' })
+    } finally {
       setLoading(false)
-    }, 1000)
+    }
   }
 
   return (
@@ -89,6 +91,10 @@ export default function Login() {
               />
               {errors.password && <span className="form-error">{errors.password}</span>}
             </div>
+
+            {errors.form && (
+              <p className="form-error" style={{ marginBottom: 12 }}>{errors.form}</p>
+            )}
 
             <button type="submit" className="btn btn-primary" style={{ width:'100%' }} disabled={loading}>
               {loading ? 'Signing in...' : 'Sign In →'}

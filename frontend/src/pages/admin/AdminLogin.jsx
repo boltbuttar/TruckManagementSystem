@@ -20,15 +20,18 @@ export default function AdminLogin() {
     return !Object.keys(e).length
   }
 
-  const handleSubmit = (ev) => {
+  const handleSubmit = async (ev) => {
     ev.preventDefault()
     if (!validate()) return
     setLoading(true)
-    setTimeout(() => {
-      login({ name: 'Super Admin', email: form.email, role: 'admin' })
+    try {
+      await login({ email: form.email, password: form.password, role: 'admin' })
       navigate('/admin/dashboard')
+    } catch (err) {
+      setErrors({ form: err.message || 'Invalid admin credentials' })
+    } finally {
       setLoading(false)
-    }, 1000)
+    }
   }
 
   return (
@@ -68,14 +71,14 @@ export default function AdminLogin() {
             {errors.password && <span className="form-error">{errors.password}</span>}
           </div>
 
+          {errors.form && (
+            <p className="form-error" style={{ marginBottom: 12 }}>{errors.form}</p>
+          )}
+
           <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
             {loading ? 'Authenticating...' : 'Access Admin Panel →'}
           </button>
         </form>
-
-        <p style={{ textAlign:'center', marginTop:20, fontSize:13, color:'var(--text-muted)' }}>
-          Demo: use any email + password
-        </p>
       </div>
     </div>
   )

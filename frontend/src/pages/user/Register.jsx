@@ -29,15 +29,35 @@ export default function Register() {
     return !Object.keys(e).length
   }
 
-  const handleSubmit = (ev) => {
+  const handleSubmit = async (ev) => {
     ev.preventDefault()
     if (!validate()) return
     setLoading(true)
-    setTimeout(() => {
-      login({ name: form.name, email: form.email, role: 'driver' })
-      navigate('/')
+    try {
+      // Register the driver account, then log in with the returned token.
+      const data = await (await import('../../services/api')).auth.register({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        cdl: form.cdl,
+        truckType: form.truckType,
+        state: form.state,
+        password: form.password,
+      })
+      // Persist the session using the token returned by the backend.
+      await login({
+        id: data.user?.id ?? data.id,
+        name: data.user?.name ?? form.name,
+        email: data.user?.email ?? form.email,
+        role: data.user?.role ?? 'driver',
+        token: data.token ?? data.accessToken,
+      })
+      navigate('/driver/dashboard')
+    } catch (err) {
+      setErrors({ form: err.message || 'Registration failed. Please try again.' })
+    } finally {
       setLoading(false)
-    }, 1200)
+    }
   }
 
   const fi = (k) => ({
@@ -106,6 +126,10 @@ export default function Register() {
                 {errors.confirm && <span className="form-error">{errors.confirm}</span>}
               </div>
             </div>
+
+            {errors.form && (
+              <p className="form-error" style={{ marginBottom: 8 }}>{errors.form}</p>
+            )}
 
             <button type="submit" className="btn btn-primary" style={{ width:'100%', marginTop:8 }} disabled={loading}>
               {loading ? 'Creating Account...' : 'Create Driver Account →'}
